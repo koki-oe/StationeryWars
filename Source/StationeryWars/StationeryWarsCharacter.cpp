@@ -10,6 +10,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "Net/UnrealNetwork.h"
+#include "Engine/Engine.h"
 
 AStationeryWarsCharacter::AStationeryWarsCharacter()
 {
@@ -50,5 +52,40 @@ AStationeryWarsCharacter::AStationeryWarsCharacter()
 
 void AStationeryWarsCharacter::Tick(float DeltaSeconds)
 {
-    Super::Tick(DeltaSeconds);
+	Super::Tick(DeltaSeconds);
+}
+
+void AStationeryWarsCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AStationeryWarsCharacter, CurrentHealth);
+}
+
+void AStationeryWarsCharacter::OnHealthUpdate()
+{
+	if (IsLocallyControlled())
+	{
+		const FString healthMessage = FString::Printf(TEXT("You now have %f health remaining.", CurrentHealth));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
+
+		if (CurrentHealth <= 0)
+		{
+			const FString deathMessage = FString::Printf(TEXT("You have been killed."));
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, deathMessage);
+		}
+
+		if (GetLocalRole() == ROLE_Authority)
+		{
+			GEngine->AddOnScreenDebugMessage(
+				-1, 5.f, FColor::Blue,
+				healthMessage.Replace(TEXT("You"), *GetFName().ToString())
+			);
+		}
+	}
+}
+
+void AStationeryWarsCharacter::OnRep_CurrentHealth()
+{
+	OnHealthUpdate();
 }

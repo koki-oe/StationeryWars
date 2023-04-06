@@ -14,6 +14,8 @@ class AStationeryWarsCharacter : public ACharacter
 public:
 	AStationeryWarsCharacter();
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -22,7 +24,7 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
-	const float DefaultHealth = 100.0F;
+	const float DefaultHealth = 100.0f;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Health")
@@ -33,6 +35,8 @@ protected:
 
 	UFUNCTION()
 	void OnRep_CurrentHealth();
+
+	void OnHealthUpdate();
 
 private:
 	/** Top down camera */
