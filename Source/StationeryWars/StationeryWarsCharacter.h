@@ -26,6 +26,9 @@ public:
 
 	const float DefaultHealth = 100.0f;
 
+	UFUNCTION(BlueprintPure, Category="Health")
+	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Health")
 	float MaxHealth;
