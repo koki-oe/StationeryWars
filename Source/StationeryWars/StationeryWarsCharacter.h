@@ -29,6 +29,15 @@ public:
 	UFUNCTION(BlueprintPure, Category="Health")
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 
+	UFUNCTION(BlueprintPure, Category="Health")
+	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
+
+	UFUNCTION(BlueprintCallable, Category="Health")
+	void SetCurrentHealth(float healthValue);
+
+	UFUNCTION(BlueprintCallable, Category="Health")
+	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Health")
 	float MaxHealth;

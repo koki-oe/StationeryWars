@@ -89,3 +89,20 @@ void AStationeryWarsCharacter::OnRep_CurrentHealth()
 {
 	OnHealthUpdate();
 }
+
+void AStationeryWarsCharacter::SetCurrentHealth(float healthValue)
+{
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		CurrentHealth = FMath::Clamp(healthValue, 0.f, MaxHealth);
+		OnHealthUpdate();
+	}
+}
+
+float AStationeryWarsCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float damageApplied = CurrentHealth - DamageAmount;
+	SetCurrentHealth(damageApplied);
+	return damageApplied;
+}
+
