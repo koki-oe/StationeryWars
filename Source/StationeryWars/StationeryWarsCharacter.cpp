@@ -66,7 +66,7 @@ void AStationeryWarsCharacter::OnHealthUpdate()
 {
 	if (IsLocallyControlled())
 	{
-		const FString healthMessage = FString::Printf(TEXT("You now have %f health remaining.", CurrentHealth));
+		const FString healthMessage = FString::Printf(TEXT("You now have %f health remaining."), CurrentHealth);
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, healthMessage);
 
 		if (CurrentHealth <= 0)
@@ -99,10 +99,10 @@ void AStationeryWarsCharacter::SetCurrentHealth(float healthValue)
 	}
 }
 
-float AStationeryWarsCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float AStationeryWarsCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
+                                           AController* EventInstigator, AActor* DamageCauser)
 {
 	float damageApplied = CurrentHealth - DamageAmount;
 	SetCurrentHealth(damageApplied);
 	return damageApplied;
 }
-
