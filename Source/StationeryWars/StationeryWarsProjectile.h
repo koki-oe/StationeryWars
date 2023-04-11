@@ -10,8 +10,8 @@ UCLASS()
 class STATIONERYWARS_API AStationeryWarsProjectile : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AStationeryWarsProjectile();
 
@@ -37,8 +37,15 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+	virtual void Destroyed() override;
+
+	UFUNCTION(Category="Projectile")
+	void OnProjectileImpact(
+		UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse, const FHitResult& Hit
+	);
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 };

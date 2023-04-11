@@ -8,15 +8,16 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/DamageType.h"
+#include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
 #include "UObject/ConstructorHelpers.h"
 
 // Sets default values
 AStationeryWarsProjectile::AStationeryWarsProjectile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	bReplicates = true;
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("RootComponent"));
@@ -24,7 +25,11 @@ AStationeryWarsProjectile::AStationeryWarsProjectile()
 	SphereComponent->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	RootComponent = SphereComponent;
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMesh(TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
+	if (GetLocalRole() == ROLE_Authority)
+		SphereComponent->OnComponentHit.AddDynamic(this, &AStationeryWarsProjectile::OnProjectileImpact);
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMesh(
+		TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	StaticMesh->SetupAttachment(RootComponent);
 
@@ -35,7 +40,8 @@ AStationeryWarsProjectile::AStationeryWarsProjectile()
 		StaticMesh->SetRelativeScale3D(FVector(0.75f, 0.75f, 0.75f));
 	}
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> DefaultExplosionEffect(TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> DefaultExplosionEffect(
+		TEXT("/Game/StarterContent/Particles/P_Explosion.P_Explosion"));
 	if (DefaultExplosionEffect.Succeeded())
 	{
 		ExplosionEffect = DefaultExplosionEffect.Object;
@@ -56,13 +62,31 @@ AStationeryWarsProjectile::AStationeryWarsProjectile()
 void AStationeryWarsProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void AStationeryWarsProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
+void AStationeryWarsProjectile::Destroyed()
+{
+	const FVector spawnLocation = GetActorLocation();
+	UGameplayStatics::SpawnEmitterAtLocation(
+		this, ExplosionEffect, spawnLocation,
+		FRotator::ZeroRotator, true, EPSCPoolMethod::AutoRelease
+	);
+}
+
+void AStationeryWarsProjectile::OnProjectileImpact(
+	UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor)
+		UGameplayStatics::ApplyPointDamage(
+			OtherActor, Damage, NormalImpulse, Hit,
+			GetInstigator()->Controller, this, DamageType
+		);
+	Destroy();
+}
