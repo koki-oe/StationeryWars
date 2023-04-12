@@ -12,6 +12,7 @@
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
+#include "StationeryWarsProjectile.h"
 
 AStationeryWarsCharacter::AStationeryWarsCharacter()
 {

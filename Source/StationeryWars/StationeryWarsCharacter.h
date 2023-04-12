@@ -36,7 +36,8 @@ public:
 	void SetCurrentHealth(float healthValue);
 
 	UFUNCTION(BlueprintCallable, Category="Health")
-	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	                 AActor* DamageCauser) override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Health")
@@ -49,6 +50,25 @@ protected:
 	void OnRep_CurrentHealth();
 
 	void OnHealthUpdate();
+
+	UPROPERTY(EditDefaultsOnly, Category="Gameplay|Projectile")
+	TSubclassOf<class AStationeryWarsProjectile> ProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Gameplay")
+	float FireRate;
+
+	bool bIsFiringWeapon;
+
+	UFUNCTION(BlueprintCallable, Category="Gameplay")
+	void StartFire();
+
+	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	void StopFire();
+
+	//UFUNCTION(Server, Reliable)
+	//void HandleFire();
+
+	FTimerHandle FiringTimer;
 
 private:
 	/** Top down camera */
