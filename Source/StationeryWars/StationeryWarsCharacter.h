@@ -65,8 +65,8 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	void StopFire();
 
-	//UFUNCTION(Server, Reliable)
-	//void HandleFire();
+	UFUNCTION(Server, Reliable)
+	void HandleFire();
 
 	FTimerHandle FiringTimer;
 

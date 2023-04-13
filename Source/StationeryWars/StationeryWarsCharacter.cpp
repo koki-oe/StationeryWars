@@ -49,6 +49,10 @@ AStationeryWarsCharacter::AStationeryWarsCharacter()
 
 	MaxHealth = DefaultHealth;
 	CurrentHealth = MaxHealth;
+
+	ProjectileClass = AStationeryWarsProjectile::StaticClass();
+	FireRate = 0.25f;
+	bIsFiringWeapon = false;
 }
 
 void AStationeryWarsCharacter::Tick(float DeltaSeconds)
@@ -106,4 +110,32 @@ float AStationeryWarsCharacter::TakeDamage(float DamageAmount, FDamageEvent cons
 	float damageApplied = CurrentHealth - DamageAmount;
 	SetCurrentHealth(damageApplied);
 	return damageApplied;
+}
+
+void AStationeryWarsCharacter::StartFire()
+{
+	if (bIsFiringWeapon) return;
+
+	bIsFiringWeapon = true;
+	const UWorld* World = GetWorld();
+	World->GetTimerManager().SetTimer(FiringTimer, this, &AStationeryWarsCharacter::StopFire, FireRate, false);
+	HandleFire();
+}
+
+void AStationeryWarsCharacter::StopFire()
+{
+	bIsFiringWeapon = false;
+}
+
+void AStationeryWarsCharacter::HandleFire_Implementation()
+{
+	const FVector SpawnLocation = GetActorLocation() + (GetActorRotation().Vector() * 100.0f) + (GetActorUpVector() * 50.0f);
+	const FRotator SpawnRotation = GetActorRotation();
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.Instigator = GetInstigator();
+	SpawnParameters.Owner = this;
+
+	AStationeryWarsProjectile* SpawnedProjectile =
+		GetWorld()->SpawnActor<AStationeryWarsProjectile>(SpawnLocation, SpawnRotation, SpawnParameters);
 }
